@@ -1,4 +1,4 @@
-local CustomShop = loadstring(game:HttpGet("https://raw.githubusercontent.com/xxx/custom-shop.lua"))()
+local CustomShop = loadstring(game:HttpGet("https://raw.githubusercontent.com/arkanzulfadliputra-oss/Games/refs/heads/main/Doors/Mod/Custom%20Shop/CustomShopSource.lua"))()
 
 local tool = LoadCustomInstance("rbxassetid://11397433017")
 
