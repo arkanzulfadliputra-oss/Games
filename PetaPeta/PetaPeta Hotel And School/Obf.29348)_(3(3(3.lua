@@ -41,6 +41,14 @@ elseif p == 116387287343653 then
 
     loadstring(game:HttpGet(x(b)))()
 
+    elseif p == 14451515684 then
+
+    sg:SetCore("SendNotification", {
+        Title = "Info",
+        Text = "Sorry if there is Unavailable",
+        Duration = 4
+    })
+
 else
 
     sg:SetCore("SendNotification",{
