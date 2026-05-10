@@ -49,6 +49,14 @@ elseif p == 116387287343653 then
         Duration = 4
     })
 
+    elseif p == 110280222997707 then
+
+    StarterGui:SetCore("SendNotification", {
+        Title = "Info",
+        Text = "Lobby Not Supported",
+        Duration = 4
+    })    
+
 else
 
     sg:SetCore("SendNotification",{
