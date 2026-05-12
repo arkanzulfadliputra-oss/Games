@@ -19,119 +19,86 @@ local LocalPlayer =
 	game.Players.LocalPlayer
 
 local Script_ESP = {}
-local Script_Running = false
 
 local Toggle = Tab:CreateToggle({
-	Name = "ESP Rat Fixed",
+	Name = "ESP Rat Clean",
 	CurrentValue = false,
-	Flag = "ESPRatFixed",
+	Flag = "ESPRatClean",
 
 	Callback = function(Value)
 
-		local function GetMainPart(Object)
+		local function GetRootPart(model)
 
-			if not Object then
+			if not model or not model:IsA("Model") then
 				return nil
 			end
 
-			if Object:IsA("Model") then
-
-				local Part =
-					Object.PrimaryPart
-					or Object:FindFirstChildWhichIsA(
-						"BasePart",
-						true
-					)
-
-				-- pastikan model valid (punya minimal 1 part)
-				if Part and Part:IsA("BasePart") then
-					return Part
-				end
-			end
-
-			return nil
+			return model.PrimaryPart
+				or model:FindFirstChild("HumanoidRootPart")
+				or model:FindFirstChildWhichIsA("BasePart", true)
 		end
 
-		local function CreateESP(Object)
+		local function CreateESP(model)
 
-			if Script_ESP[Object] then
+			if Script_ESP[model] then
 				return
 			end
 
-			local Part = GetMainPart(Object)
+			local root =
+				GetRootPart(model)
 
-			if not Part then
+			if not root then
 				return
 			end
 
-			local Highlight =
+			-- HANYA 1 highlight (tidak semua body part)
+			local highlight =
 				Instance.new("Highlight")
 
-			Highlight.Adornee = Object
-			Highlight.FillColor =
+			highlight.Name =
+				"Script_Esp"
+
+			highlight.Adornee =
+				root.Parent -- tetap model, tapi visualnya tidak detail limb
+
+			highlight.FillColor =
 				Color3.fromRGB(255, 255, 0)
-			Highlight.FillTransparency = 0.5
-			Highlight.OutlineTransparency = 0
-			Highlight.DepthMode =
+
+			highlight.FillTransparency = 0.5
+			highlight.OutlineTransparency = 0
+			highlight.DepthMode =
 				Enum.HighlightDepthMode.AlwaysOnTop
 
-			Highlight.Parent = Object
+			highlight.Parent =
+				root.Parent
 
-			local Billboard =
+			-- Billboard cuma di 1 part
+			local billboard =
 				Instance.new("BillboardGui")
 
-			Billboard.Adornee = Part
-			Billboard.Size =
-				UDim2.new(0, 150, 0, 40)
-			Billboard.AlwaysOnTop = true
-			Billboard.StudsOffset =
+			billboard.Adornee = root
+			billboard.Size =
+				UDim2.new(0, 120, 0, 30)
+			billboard.AlwaysOnTop = true
+			billboard.StudsOffset =
 				Vector3.new(0, 2, 0)
 
-			Billboard.Parent = Part
+			billboard.Parent = root
 
-			local Text =
+			local text =
 				Instance.new("TextLabel")
 
-			Text.Size =
+			text.Size =
 				UDim2.new(1, 0, 1, 0)
-			Text.BackgroundTransparency = 1
-			Text.TextScaled = true
-			Text.Font = Enum.Font.GothamBold
-			Text.TextColor3 =
+			text.BackgroundTransparency = 1
+			text.TextScaled = true
+			text.Font = Enum.Font.GothamBold
+			text.TextColor3 =
 				Color3.fromRGB(255, 255, 0)
-			Text.Parent = Billboard
+			text.Text = model.Name
+			text.Parent = billboard
 
-			Script_ESP[Object] = true
-
-			task.spawn(function()
-
-				while Object.Parent
-				and Part.Parent do
-
-					task.wait(0.5)
-
-					local char =
-						LocalPlayer.Character
-
-					local hrp =
-						char
-						and char:FindFirstChild(
-							"HumanoidRootPart"
-						)
-
-					if hrp then
-
-						local dist =
-							(hrp.Position - Part.Position).Magnitude
-
-						Text.Text =
-							Object.Name ..
-							" [" ..
-							math.floor(dist) ..
-							"m]"
-					end
-				end
-			end)
+			Script_ESP[model] = true
 		end
 
 		Script_Running = Value
@@ -165,7 +132,7 @@ local Toggle = Tab:CreateToggle({
 			table.clear(Script_ESP)
 		end
 	end,
-})			
+})				
 
 local LocalPlayer =
 	game.Players.LocalPlayer
