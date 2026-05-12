@@ -20,193 +20,152 @@ local LocalPlayer =
 
 local Script_ESP = {}
 local Script_Running = false
-local Script_Thread
 
 local Toggle = Tab:CreateToggle({
-	Name = "ESP Rat",
+	Name = "ESP Rat Fixed",
 	CurrentValue = false,
-	Flag = "ESPRat",
+	Flag = "ESPRatFixed",
 
 	Callback = function(Value)
 
-		local function CreateESP(Object, ESPName)
+		local function GetMainPart(Object)
 
 			if not Object then
-				return
+				return nil
 			end
-
-			if Script_ESP[Object] then
-				return
-			end
-
-			local Part
 
 			if Object:IsA("Model") then
-				Part =
+
+				local Part =
 					Object.PrimaryPart
 					or Object:FindFirstChildWhichIsA(
 						"BasePart",
 						true
 					)
-			else
-				Part = Object
+
+				-- pastikan model valid (punya minimal 1 part)
+				if Part and Part:IsA("BasePart") then
+					return Part
+				end
 			end
+
+			return nil
+		end
+
+		local function CreateESP(Object)
+
+			if Script_ESP[Object] then
+				return
+			end
+
+			local Part = GetMainPart(Object)
 
 			if not Part then
 				return
 			end
 
-			local ESPColor =
-				Color3.fromRGB(255, 255, 0)
-
 			local Highlight =
 				Instance.new("Highlight")
 
-			Highlight.Name =
-				"Script_ESP_Highlight"
-
 			Highlight.Adornee = Object
-			Highlight.FillColor = ESPColor
+			Highlight.FillColor =
+				Color3.fromRGB(255, 255, 0)
 			Highlight.FillTransparency = 0.5
 			Highlight.OutlineTransparency = 0
-
 			Highlight.DepthMode =
 				Enum.HighlightDepthMode.AlwaysOnTop
 
 			Highlight.Parent = Object
 
-			local BillboardGui =
+			local Billboard =
 				Instance.new("BillboardGui")
 
-			BillboardGui.Name =
-				"Script_ESP_BillboardGui"
+			Billboard.Adornee = Part
+			Billboard.Size =
+				UDim2.new(0, 150, 0, 40)
+			Billboard.AlwaysOnTop = true
+			Billboard.StudsOffset =
+				Vector3.new(0, 2, 0)
 
-			BillboardGui.Size =
-				UDim2.new(0, 180, 0, 45)
+			Billboard.Parent = Part
 
-			BillboardGui.AlwaysOnTop = true
-
-			BillboardGui.StudsOffset =
-				Vector3.new(0, 3, 0)
-
-			BillboardGui.Adornee = Part
-			BillboardGui.Parent = Part
-
-			local TextLabel =
+			local Text =
 				Instance.new("TextLabel")
 
-			TextLabel.Name =
-				"Script_ESP_TextLabel"
-
-			TextLabel.Size =
+			Text.Size =
 				UDim2.new(1, 0, 1, 0)
+			Text.BackgroundTransparency = 1
+			Text.TextScaled = true
+			Text.Font = Enum.Font.GothamBold
+			Text.TextColor3 =
+				Color3.fromRGB(255, 255, 0)
+			Text.Parent = Billboard
 
-			TextLabel.BackgroundTransparency = 1
-			TextLabel.TextScaled = true
-			TextLabel.Font = Enum.Font.GothamBold
-			TextLabel.TextColor3 = ESPColor
-			TextLabel.TextStrokeTransparency = 0.3
-			TextLabel.Parent = BillboardGui
-
-			Script_ESP[Object] = {
-				Highlight = Highlight,
-				BillboardGui = BillboardGui,
-				TextLabel = TextLabel
-			}
+			Script_ESP[Object] = true
 
 			task.spawn(function()
 
 				while Object.Parent
-				and BillboardGui.Parent do
+				and Part.Parent do
 
 					task.wait(0.5)
 
-					local Character =
+					local char =
 						LocalPlayer.Character
 
-					local HumanoidRootPart =
-						Character
-						and Character:FindFirstChild(
+					local hrp =
+						char
+						and char:FindFirstChild(
 							"HumanoidRootPart"
 						)
 
-					if HumanoidRootPart
-					and Part then
+					if hrp then
 
-						local Distance =
-							(HumanoidRootPart.Position - Part.Position).Magnitude
+						local dist =
+							(hrp.Position - Part.Position).Magnitude
 
-						TextLabel.Text =
-							ESPName ..
+						Text.Text =
+							Object.Name ..
 							" [" ..
-							math.floor(Distance) ..
-							"M]"
+							math.floor(dist) ..
+							"m]"
 					end
 				end
 			end)
-		end
-
-		local function ClearESP()
-
-			for _, ESPData in pairs(
-				Script_ESP
-			) do
-
-				if ESPData.Highlight then
-					ESPData.Highlight:Destroy()
-				end
-
-				if ESPData.BillboardGui then
-					ESPData.BillboardGui:Destroy()
-				end
-			end
-
-			table.clear(Script_ESP)
 		end
 
 		Script_Running = Value
 
 		if Value then
 
-			Script_Thread =
-				task.spawn(function()
+			task.spawn(function()
 
 				while Script_Running do
 					task.wait(1)
 
-					local MouseFolder =
-						workspace:FindFirstChild(
-							"Mouse"
-						)
+					local Mouse =
+						workspace:FindFirstChild("Mouse")
 
-					if MouseFolder then
+					if Mouse then
 
-						for _, Object in pairs(
-							MouseFolder:GetChildren()
+						for _, obj in pairs(
+							Mouse:GetChildren()
 						) do
 
-							CreateESP(
-								Object,
-								Object.Name
-							)
+							if obj:IsA("Model") then
+								CreateESP(obj)
+							end
 						end
 					end
 				end
 			end)
 
 		else
-
 			Script_Running = false
-
-			if Script_Thread then
-				task.cancel(Script_Thread)
-				Script_Thread = nil
-			end
-
-			ClearESP()
+			table.clear(Script_ESP)
 		end
 	end,
-})
+})			
 
 local LocalPlayer =
 	game.Players.LocalPlayer
@@ -529,7 +488,7 @@ local Button = Tab:CreateButton({
 })
 
 local Button = Tab:CreateButton({
-	Name = "TP + Delete DoorExit (Smart)",
+	Name = "Auto Win",
 
 	Callback = function()
 
