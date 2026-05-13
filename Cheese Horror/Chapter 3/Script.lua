@@ -397,3 +397,45 @@ local Button = Tab:CreateButton({
 		end
 	end,
 })
+
+local noclip = false
+local noclipConnection
+
+local Toggle = Tab:CreateToggle({
+    Name = "Noclip",
+    CurrentValue = false,
+    Flag = "Noclip",
+    
+    Callback = function(Value)
+        noclip = Value
+        
+        if noclip then
+            noclipConnection = game:GetService("RunService").Stepped:Connect(function()
+                local LocalPlayer = game.Players.LocalPlayer
+                
+                if LocalPlayer.Character then
+                    for _, v in pairs(LocalPlayer.Character:GetDescendants()) do
+                        if v:IsA("BasePart") then
+                            v.CanCollide = false
+                        end
+                    end
+                end
+            end)
+        else
+            if noclipConnection then
+                noclipConnection:Disconnect()
+                noclipConnection = nil
+            end
+            
+            local LocalPlayer = game.Players.LocalPlayer
+            
+            if LocalPlayer.Character then
+                for _, v in pairs(LocalPlayer.Character:GetDescendants()) do
+                    if v:IsA("BasePart") then
+                        v.CanCollide = true
+                    end
+                end
+            end
+        end
+    end
+})
