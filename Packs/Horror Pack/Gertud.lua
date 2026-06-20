@@ -76,7 +76,6 @@ local Games = {
     [6153766069] = "https://raw.githubusercontent.com/arkanzulfadliputra-oss/Games/main/Escape%20Carnival/Script.lua",
     [10384852727] = "https://pastebin.com/raw/VZp4HdVd",
     [4785497374] = "https://raw.githubusercontent.com/arkanzulfadliputra-oss/Games/main/Granny/Granny%202/Script.lua",
-    [10384858885] = "https://raw.githubusercontent.com/arkanzulfadliputra-oss/Games/refs/heads/main/Granny/Granny%203/Script.lua"
 }
 
 local Link = Games[game.PlaceId]
